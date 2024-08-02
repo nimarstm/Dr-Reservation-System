@@ -1,26 +1,33 @@
-import mysql.connector
-from mysql.connector import Error
+import mysql.connector 
 
-try:
-    connection = mysql.connector.connect(
-        host="localhost",
-        user="your_username",
-        password="your_password",
-        database="your_database"
-    )
-    
-    if connection.is_connected():
-        print("Successfully connected to the database")
-    
-    cursor = connection.cursor()
-    cursor.execute("SELECT DATABASE();")
-    record = cursor.fetchone()
-    print("You're connected to the database:", record)
-    
-except Error as e:
-    print("Error while connecting to MySQL", e)
-finally:
-    if (connection.is_connected()):
-        cursor.close()
-        connection.close()
-        print("MySQL connection is closed")
+# ایجاد اتصال به پایگاه داده
+connection = mysql.connector.connect(
+    host="localhost",  # یا آدرس سرور MySQL
+    user="root",  # نام کاربری MySQL شما
+    password="12345678",  # رمز عبور MySQL شما
+    database="reservation_system"  # نام پایگاه داده‌ای که می‌خواهید به آن وصل شوید
+)
+cursor=connection.cursor()
+# ایجاد یک شیء cursor
+sql = "SELECT * FROM userinfo WHERE USername = %s"
+val = ("Nima",)
+
+# اجرای کوئری
+cursor.execute(sql, val)
+
+# دریافت نتیجه
+row = cursor.fetchone()
+
+# بررسی و نمایش نتیجه
+if row:
+    print("ID:", row[0])
+    print("Name:", row[1])
+    print("phonenumber:", row[2])
+    print("password:", row[3])
+else:
+    print("No record found with the specified ID.")
+# بستن cursor
+cursor.close()
+
+# بستن اتصال به پایگاه داده
+connection.close()

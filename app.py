@@ -292,29 +292,53 @@ w = setTest ^ setTest2
 # dictionary (کلید مقدار)
 dicTest = {"x": 1, "y": "2", "m": 100}
 dicTest2 = {0: "A", 1: "B", 2: "c", 3: 30}
-dicTest3=dict(x=1 , y=2,m=100)
+dicTest3 = dict(x=1, y=2, m=100)
 print(dicTest2.keys())
 print(dicTest["x"])
-#عوض کردن مقدار یک کلید
-dicTest["x"]=1000
+# عوض کردن مقدار یک کلید
+dicTest["x"] = 1000
 # اضافه کردن یک مقدار و کلید
-dicTest["v"]=200
+dicTest["v"] = 200
 print(dicTest)
-#آرکومان دوم واسه اینه که اگه اون کلید وجود نداشت اون رو برگردونه
-print(dicTest.get("x",000))
-#حذف کلید و مقدا
+# آرکومان دوم واسه اینه که اگه اون کلید وجود نداشت اون رو برگردونه
+print(dicTest.get("x", 000))
+# حذف کلید و مقدا
 del dicTest["m"]
-#پیمایش روی کلید
+# پیمایش روی کلید
 for x in dicTest:
     print(x)
-#پیمایش روی مقدار
+# پیمایش روی مقدار
 for x in dicTest:
     print(dicTest[x])
-        
-#به صورت تاپل پیمایش میکنه
+
+# به صورت تاپل پیمایش میکنه
 for x in dicTest.items():
     print(x)
 
-#پیمایش و انپک
+# پیمایش و انپک
 for x, y in dicTest.items():
-         print(x,y)
+    print(x, y)
+
+# dictionary comprehention
+valu = {x: x*2 for x in range(5)}
+print(valu)
+
+#generator
+valu2=(x*2 for x in range(5))
+
+#unpacking operator
+print(*valu)
+# دوتا ستاره برای دیکشنری
+
+#exception
+
+try:
+    age=int(input("age:"))
+except ValueError:
+    print("you entered invalid number")
+except ZeroDivisionError:
+    print("age can not be zero")   
+    
+# هر دو اکسپشن رو میشه درون پارانتز در یک اگسپشن نوشت
+finally:
+    print("program last action")
