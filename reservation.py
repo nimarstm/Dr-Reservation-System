@@ -48,6 +48,35 @@ class Person():
             print("failed remove")
             return 0
 
+    def Changeinfo(self, newusername, newphonenumber, newpassword):
+        connection = Connection0()
+        cursor = connection.cursor()
+        if newusername:
+            sql="UPDATE userinfo SET Username=%s WHERE ID=%s"
+            val=(newusername,Id0)
+            cursor.execute(sql, val)
+            connection.commit()
+            print("username changed")   
+        if newphonenumber:
+            sql="UPDATE userinfo SET PhoneNumber=%s WHERE ID=%s"
+            val=(newphonenumber,Id0)
+            cursor.execute(sql, val)
+            connection.commit()
+            print("phonenumber changed")  
+        if newpassword:
+            sql="UPDATE userinfo SET Password=%s WHERE ID=%s"
+            val=(newpassword,Id0)
+            cursor.execute(sql, val)
+            connection.commit()
+            print("password changed")      
+        if cursor.rowcount > 0:
+            print("successfully changes")
+            return 1
+        else:
+            print("failed change")
+            return 0
+            
+
 
 class Login():
     def __init__(self, username, password):
@@ -150,6 +179,7 @@ def signupButtonCommand():
 
 
 def MyReserveMenuCommand():
+    setting_pannel.pack_forget()
     wellcom_label.config(text="Your reserves history", foreground="black")
     myreserve_list_box.delete(0, END)
     myreserve_pannel.pack(fill="both", expand=True)
@@ -158,6 +188,19 @@ def MyReserveMenuCommand():
     for a, b, c, d in row0:
         myreserve_list_box.insert(END, f"Reservation Code : ~{a}~ Doctor Name : {
                                   b} Date : {c} Time : {d} \n")
+
+
+def SettingMenuCommand():
+    myreserve_pannel.pack_forget()
+    wellcom_label.config(text="You Can Change your information")
+    setting_pannel.pack(fill="none", expand=True)
+    setting_pannel.add(setting_username_label)
+    setting_pannel.add(setting_username_entry)
+    setting_pannel.add(setting_phonenumber_label)
+    setting_pannel.add(setting_phonenumber_entry)
+    setting_pannel.add(setting_password_label)
+    setting_pannel.add(setting_password_entry)
+    setting_pannel.add(setting_changeinfo_button)
 
 
 def reserve_remove_command():
@@ -175,6 +218,16 @@ def reserve_remove_command():
             print("deleting operation failed")
     else:
         print("please select to delete")
+
+
+def change_info_command():
+    person = person_list[0]
+    result= person.Changeinfo(setting_username_entry.get(
+    ), setting_phonenumber_entry.get(), setting_password_entry.get())
+    if result==1:
+        print("change info was successfull")
+    else:
+        print("change info failed")
 
 
 def loginpage():
@@ -234,7 +287,7 @@ reservemenu.add_command(label="4.Gynecologist")
 reservemenu.add_command(label="5.Neurologist")
 menubar.add_cascade(label="Reserve", menu=reservemenu)
 menubar.add_command(label="My Reservs", command=MyReserveMenuCommand)
-menubar.add_command(label="Setting")
+menubar.add_command(label="Setting", command=SettingMenuCommand)
 menubar.add_command(label="Support")
 menubar.add_command(label="Help")
 menubar.add_command(label="quit", command=Window.quit)
@@ -243,4 +296,16 @@ myreserve_pannel = PanedWindow(Window, bd=50, bg="grey")
 myreserve_list_box = Listbox(myreserve_pannel, font=custom_font)
 reservedelete_button = Button(
     myreserve_pannel, text="Delete Reserve", font=20, command=reserve_remove_command)
+setting_pannel = PanedWindow(Window, bd=50, bg="black")
+setting_username_label = Label(
+    setting_pannel, text="New Username", background="white")
+setting_username_entry = Entry(setting_pannel)
+setting_phonenumber_label = Label(
+    setting_pannel, text="New Phonenumber", background="white")
+setting_phonenumber_entry = Entry(setting_pannel)
+setting_password_label = Label(
+    setting_pannel, text="New Password", background="white")
+setting_password_entry = Entry(setting_pannel)
+setting_changeinfo_button = Button(
+    setting_pannel, text="Change info", font=16, background="red", command=change_info_command)
 Window.mainloop()
