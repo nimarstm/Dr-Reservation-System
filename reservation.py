@@ -1,7 +1,11 @@
 from tkinter import *
+from tkinter import font
+
 import mysql.connector
 
 Id0 = " "
+row0 = []
+person_list = []
 
 
 def Connection0():
@@ -23,11 +27,26 @@ class Person():
     def ReservedListShow(self):
         connection = Connection0()
         cursor = connection.cursor()
-        sql = "SELECT * FROM reserve_info WHERE userID = %s"
+        sql = "SELECT ID, drName, Date, Time FROM reserve_info WHERE userID = %s"
         val = (Id0,)
         cursor.execute(sql, val)
-        row = cursor.fetchall()
-        print(row)
+        global row0
+        row0 = cursor.fetchall()
+        print(row0)
+
+    def ReserveRemove(self, reserveID):
+        connection = Connection0()
+        cursor = connection.cursor()
+        sql = "Delete From reserve_info Where ID=%s"
+        val = (reserveID,)
+        cursor.execute(sql, val)
+        connection.commit()
+        if cursor.rowcount > 0:
+            print("successfully rmoved")
+            return 1
+        else:
+            print("failed remove")
+            return 0
 
 
 class Login():
@@ -51,6 +70,8 @@ class Login():
             print("password:", row[3])
             if row[3] == self.password:
                 person = Person(self.username, row[3], self.password)
+                global person_list
+                person_list.insert(0, person)
                 person.ReservedListShow()
                 return 1
             else:
@@ -128,6 +149,34 @@ def signupButtonCommand():
                 phonenumber_entry.get(), password_entry.get())
 
 
+def MyReserveMenuCommand():
+    wellcom_label.config(text="Your reserves history", foreground="black")
+    myreserve_list_box.delete(0, END)
+    myreserve_pannel.pack(fill="both", expand=True)
+    reservedelete_button.pack(side="bottom")
+    myreserve_pannel.add(myreserve_list_box)
+    for a, b, c, d in row0:
+        myreserve_list_box.insert(END, f"Reservation Code : ~{a}~ Doctor Name : {
+                                  b} Date : {c} Time : {d} \n")
+
+
+def reserve_remove_command():
+    selected_indices = myreserve_list_box.curselection()  # دریافت ایندکس‌های انتخاب شده
+    # دریافت آیتم‌های انتخاب شده
+    if len(selected_indices) == 1:
+        selected_items = [myreserve_list_box.get(i) for i in selected_indices]
+        print("Selected items:", selected_items)
+        selected_items_list = selected_items[0].split("~")
+        person = person_list[0]
+        result = person.ReserveRemove(selected_items_list[1])
+        if result == 1:
+            myreserve_list_box.delete(selected_indices[0])
+        else:
+            print("deleting operation failed")
+    else:
+        print("please select to delete")
+
+
 def loginpage():
     wellcom_label.config(text="Log in page", foreground="orange")
     login_show_button.pack_forget()
@@ -184,9 +233,14 @@ reservemenu.add_command(label="3.General practitioner")
 reservemenu.add_command(label="4.Gynecologist")
 reservemenu.add_command(label="5.Neurologist")
 menubar.add_cascade(label="Reserve", menu=reservemenu)
-menubar.add_command(label="My Reservs")
+menubar.add_command(label="My Reservs", command=MyReserveMenuCommand)
 menubar.add_command(label="Setting")
 menubar.add_command(label="Support")
 menubar.add_command(label="Help")
 menubar.add_command(label="quit", command=Window.quit)
+custom_font = font.Font(family="Helvetica", size=16)
+myreserve_pannel = PanedWindow(Window, bd=50, bg="grey")
+myreserve_list_box = Listbox(myreserve_pannel, font=custom_font)
+reservedelete_button = Button(
+    myreserve_pannel, text="Delete Reserve", font=20, command=reserve_remove_command)
 Window.mainloop()
