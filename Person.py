@@ -1,7 +1,6 @@
 from config import *
 from datetime import date
 import config
-current_date = date.today()
 
 
 class Person:
@@ -65,14 +64,13 @@ class Person:
             return 0
 
     def ChangePassword(self, newpassword):
-        if newpassword:
-            connection = Connection0()
-            cursor = connection.cursor()
-            sql = "UPDATE userinfo SET Password=%s WHERE ID=%s"
-            val = (newpassword, config.Id0)
-            cursor.execute(sql, val)
-            connection.commit()
-            print("password changed")
+        connection = Connection0()
+        cursor = connection.cursor()
+        sql = "UPDATE userinfo SET Password=%s WHERE ID=%s"
+        val = (newpassword, config.Id0)
+        cursor.execute(sql, val)
+        connection.commit()
+        print("password changed")
         if cursor.rowcount > 0:
             print("successfully changes")
             return 1
@@ -108,12 +106,58 @@ class Person:
     #         print("failed change")
     #         return 0
 
-    def ShowDoctorList(self, category):
+    def ShowDoctorName(self, category):
+        current_date = date.today()
         connection = Connection0()
         cursor = connection.cursor()
-        sql = "Select * From drinfo Where Expert=%s and Date>=%s "
-        val = (category, current_date)
+        sql = "Select * From drinfo Where Expert=%s and Date>=%s and Capacity>0 "
+        val = (category, str(current_date))
         cursor.execute(sql, val)
-        drlist = cursor.fetchmany(2)
-        dr_dict = {}
+        drlist = [row[1] for row in cursor.fetchall()]
         print(drlist)
+        return drlist
+
+    def ShowDoctorDate(self, category, drname):
+        current_date = date.today()
+        connection = Connection0()
+        cursor = connection.cursor()
+        sql = "Select * From drinfo Where Expert=%s and Date>=%s and Capacity>0 and Name=%s "
+        val = (category, str(current_date), drname)
+        cursor.execute(sql, val)
+        drdate = [row[3] for row in cursor.fetchall()]
+        return drdate
+
+    def ShowDoctorTime(self, category, drname, drdate):
+        current_date = date.today()
+        connection = Connection0()
+        cursor = connection.cursor()
+        sql = "Select * From drinfo Where Expert=%s and Date>=%s and Capacity>0 and Name=%s and Date=%s"
+        val = (category, str(current_date), drname, drdate)
+        cursor.execute(sql, val)
+        drtime = [row[4] for row in cursor.fetchall()]
+        return drtime
+
+    def SubmitReserve(self, category, drname, drdate, drtime):
+        connection = Connection0()
+        cursor = connection.cursor()
+        sql = "UPDATE drinfo SET Capacity=%s WHERE Expert=%s and Name=%s and Date=%s and Time=%s"
+        val = (0, category, drname, drdate, drtime)
+        cursor.execute(sql, val)
+        connection.commit()
+        print("capacity changed")
+        if cursor.rowcount > 0:
+            print("successfully submited")
+            return 1
+
+        else:
+            print("failed submit")
+            return 0
+
+    def AddtoReserveInfo(self, drname, drdate, drtime):
+        connection = Connection0()
+        cursor = connection.cursor()
+        insert_query = "INSERT INTO reserve_info (drName, userID, Date, Time) VALUES (%s, %s, %s,%s)"
+        values = (drname, config.Id0, drdate, drtime)
+        cursor.execute(insert_query, values)
+        connection.commit()
+        print("reserve inseted to reserve info")
