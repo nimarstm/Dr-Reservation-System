@@ -1,8 +1,9 @@
 from tkinter import *
 from tkinter import font
-
+from tkinter import ttk
+from datetime import date
 import mysql.connector
-
+current_date = date.today()
 Id0 = " "
 row0 = []
 person_list = []
@@ -52,33 +53,42 @@ class Person():
         connection = Connection0()
         cursor = connection.cursor()
         if newusername:
-            sql="UPDATE userinfo SET Username=%s WHERE ID=%s"
-            val=(newusername,Id0)
+            sql = "UPDATE userinfo SET Username=%s WHERE ID=%s"
+            val = (newusername, Id0)
             cursor.execute(sql, val)
             connection.commit()
-            print("username changed")   
+            print("username changed")
         if newphonenumber:
-            sql="UPDATE userinfo SET PhoneNumber=%s WHERE ID=%s"
-            val=(newphonenumber,Id0)
+            sql = "UPDATE userinfo SET PhoneNumber=%s WHERE ID=%s"
+            val = (newphonenumber, Id0)
             cursor.execute(sql, val)
             connection.commit()
-            print("phonenumber changed")  
+            print("phonenumber changed")
         if newpassword:
-            sql="UPDATE userinfo SET Password=%s WHERE ID=%s"
-            val=(newpassword,Id0)
+            sql = "UPDATE userinfo SET Password=%s WHERE ID=%s"
+            val = (newpassword, Id0)
             cursor.execute(sql, val)
             connection.commit()
-            print("password changed")      
+            print("password changed")
         if cursor.rowcount > 0:
             print("successfully changes")
             return 1
         else:
             print("failed change")
             return 0
-            
+
+    def ShowDoctorList(self, category):
+        connection = Connection0()
+        cursor = connection.cursor()
+        sql = "Select * From drinfo Where Expert=%s and Date>=%s "
+        val = (category, current_date)
+        cursor.execute(sql, val)
+        drlist = cursor.fetchmany(2)
+        dr_dict={}
+        print(drlist)
 
 
-class Login():
+class Login:
     def __init__(self, username, password):
         self.username = username
         self.password = password
@@ -222,12 +232,22 @@ def reserve_remove_command():
 
 def change_info_command():
     person = person_list[0]
-    result= person.Changeinfo(setting_username_entry.get(
+    result = person.Changeinfo(setting_username_entry.get(
     ), setting_phonenumber_entry.get(), setting_password_entry.get())
-    if result==1:
+    if result == 1:
         print("change info was successfull")
     else:
         print("change info failed")
+
+
+def Reserve_Menu_Command(category):
+    person = person_list[0]
+    person.ShowDoctorList(category)
+    reserve_pannel.pack(fill="none", expand=True)
+    items = ["Option 1", "Option 2", "Option 3", "Option 4"]
+    doctor_selection_ComboBox['values'] = items
+    doctor_selection_ComboBox.pack()
+
 
 
 def loginpage():
@@ -280,11 +300,16 @@ login_button = Button(Window, text="Login", command=loginButtonCommand)
 signup_button = Button(Window, text="sign Up", command=signupButtonCommand)
 menubar = Menu(Window)
 reservemenu = Menu(menubar, tearoff=0)
-reservemenu.add_command(label="1.Dermatologist")
-reservemenu.add_command(label="2.Cardiologist")
-reservemenu.add_command(label="3.General practitioner")
-reservemenu.add_command(label="4.Gynecologist")
-reservemenu.add_command(label="5.Neurologist")
+reservemenu.add_command(label="1.Dermatologist",
+                        command=lambda: Reserve_Menu_Command("Dermotologist"))
+reservemenu.add_command(label="2.Cardiologist",
+                        command=lambda: Reserve_Menu_Command("Cardiologist"))
+reservemenu.add_command(label="3.General practitioner",
+                        command=lambda: Reserve_Menu_Command("General Practitioner"))
+reservemenu.add_command(label="4.Gynecologist",
+                        command=lambda: Reserve_Menu_Command("Gynecologist"))
+reservemenu.add_command(label="5.Neurologist",
+                        command=lambda: Reserve_Menu_Command("Neurologist"))
 menubar.add_cascade(label="Reserve", menu=reservemenu)
 menubar.add_command(label="My Reservs", command=MyReserveMenuCommand)
 menubar.add_command(label="Setting", command=SettingMenuCommand)
@@ -308,4 +333,7 @@ setting_password_label = Label(
 setting_password_entry = Entry(setting_pannel)
 setting_changeinfo_button = Button(
     setting_pannel, text="Change info", font=16, background="red", command=change_info_command)
+reserve_pannel = PanedWindow(Window, bd=50, bg="black")
+doctor_selection_ComboBox=ttk.Combobox(reserve_pannel)
+
 Window.mainloop()
