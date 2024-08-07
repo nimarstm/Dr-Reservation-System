@@ -14,7 +14,8 @@ Database exist in this repository ( Dabase.sql)
 
 Second :
 
-in terminal at python file directory enter : ( python main.py),
+in terminal at python file directory enter : ( python main.py)
 
 To test this system :
-in terminal at python file directory enter : ( pytest),
+
+in terminal at python file directory enter : ( pytest)
