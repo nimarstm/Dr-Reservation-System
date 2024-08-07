@@ -1,12 +1,15 @@
 from Person import Person
 import config
 from config import *
+
+
 class Login:
 
     def __init__(self, username, password):
         self.username = username
         self.password = password
         print(username, password)
+# Checks and extract user info for log in
 
     def checkinfo(self):
         connection = Connection0()

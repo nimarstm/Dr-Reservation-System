@@ -14,7 +14,6 @@ console = Console()
 def my_reserve_page():
     person = config.person_list[0]
     reserve_list = person.ReservedListShow()
-    print(reserve_list)
     items = []
     for a, b, c, d in reserve_list:
         items.append(f"Reservation Code : ~{a}~ Doctor Name : {
@@ -30,7 +29,7 @@ def my_reserve_page():
     ]
     reserve_preview_answer = prompt(reserve_preview)
     print(reserve_preview_answer["action"])
-    if (reserve_preview_answer["action"] == "back"):
+    if reserve_preview_answer["action"] == "back":
         firstpage()
     else:
         selected_items_list = reserve_preview_answer["action"].split("~")
@@ -206,14 +205,92 @@ def firstpage():
     if menu_bar_answer["action"] == "Create New Reserve":
         Create_New_Reserve_Page()
 
+# gets login info from user and process result
 
-def login_and_signup_page():
+
+def login_page():
+    login_questions = [
+        {
+            "type": "input",
+            "name": "username",
+            "message": "Enter your username:",
+        },
+        {
+            "type": "password",
+            "name": "password",
+            "message": "Enter your password:",
+        },
+    ]
+    login_answers = prompt(login_questions)
+    login = Login(login_answers["username"], login_answers["password"])
+    if login.checkinfo() == 0:
+        console.print("[bold red]Log in failed.[/bold red]")
+    elif login.checkinfo() == 1:
+
+        console.print("[bold green]sucsessfull log in.[/bold green]")
+        firstpage()
+    else:
+        console.print("[bold red]account not found[/bold red]")
+
+#  gets info from users to register them
+
+
+def signup_page():
+    signup_questions = [
+        {
+            "type": "input",
+            "name": "username",
+            "message": "Choose a username:",
+        },
+        {
+            "type": "input",
+            "name": "phonenumber",
+            "message": "enter a phone Number:",
+        },
+        {
+            "type": "password",
+            "name": "password",
+            "message": "Choose a password:",
+        },
+        {
+            "type": "password",
+            "name": "confirm_password",
+            "message": "Confirm your password:",
+        },
+    ]
+    signup_answers = prompt(signup_questions)
+
+    # Password match check
+    if signup_answers["password"] != signup_answers["confirm_password"]:
+        console.print(
+            "[bold red]Passwords do not match! Please try again.[/bold red]")
+        login_and_signup_selection()
+    else:
+        signup = Signup(
+            signup_answers["username"], signup_answers["phonenumber"], signup_answers["password"])
+        if signup.DuplicateUsernameCheck() == 1:
+            if signup.insert() == 1:
+                console.print(
+                    "[bold green]sucsessfull sign up please log in again.[/bold green]")
+                login_page()
+            else:
+                console.print("[bold red]sign up failed.[/bold red]")
+                login_and_signup_selection()
+        else:
+            console.print("[bold red]this username exist.[/bold red]")
+            signup_page()
+
+
+# Gets the user's choice between the login page and the signup page
+
+
+def login_and_signup_selection():
     main_menu = [
         {
             "type": "list",
             "name": "action",
             "message": "What do you want to do?",
-            "choices": ["Login", "Signup"],
+            "choices": ["Login", "Signup", "quite"],
         }
     ]
 
@@ -222,92 +299,19 @@ def login_and_signup_page():
     menu_answer = prompt(main_menu)
 
     if menu_answer["action"] == "Login":
-        # سوالات برای لاگین
-        login_questions = [
-            {
-                "type": "input",
-                "name": "username",
-                "message": "Enter your username:",
-            },
-            {
-                "type": "password",
-                "name": "password",
-                "message": "Enter your password:",
-            },
-        ]
-        login_answers = prompt(login_questions)
-        result = Login(login_answers["username"], login_answers["password"])
-        if result.checkinfo() == 0:
-            console.print("[bold red]Log in failed.[/bold red]")
-        elif result.checkinfo() == 1:
+        login_page()
 
-            console.print("[bold green]sucsessfull log in.[/bold green]")
-            login_stutus = True
-            firstpage()
-        else:
-            console.print("[bold red]account not found[/bold red]")
-
-    elif menu_answer["action"] == "Signup":
-        # سوالات برای ساین‌اپ
-        signup_questions = [
-            {
-                "type": "input",
-                "name": "username",
-                "message": "Choose a username:",
-            },
-            {
-                "type": "input",
-                "name": "phonenumber",
-                "message": "enter a phone Number:",
-            },
-            {
-                "type": "password",
-                "name": "password",
-                "message": "Choose a password:",
-            },
-            {
-                "type": "password",
-                "name": "confirm_password",
-                "message": "Confirm your password:",
-            },
-        ]
-        signup_answers = prompt(signup_questions)
-
-    # بررسی تطابق رمز عبور
-        if signup_answers["password"] != signup_answers["confirm_password"]:
-            console.print(
-                "[bold red]Passwords do not match! Please try again.[/bold red]")
-        else:
-            result = Signup(
-                signup_answers["username"], signup_answers["phonenumber"], signup_answers["password"])
-            if result.insert() == 1:
-                console.print(
-                    "[bold green]sucsessfull sign up please log in again.[/bold green]")
-            else:
-                console.print("[bold red]sign up failed.[/bold red]")
-
-    # نمایش پاسخ‌ها برای بررسی
-
-    #     questions = [
-    #         {
-    #             "type": "checkbox",
-    #             "name": "remove_items",
-    #             "message": "Select items to cancel: or go back",
-    #             "choices": items,
-    #         }
-    #     ]
-    #     answers = prompt(questions)
-    #     print(f"Answers received: {answers}")
-    #     if "remove_items" in answers:
-    #         # دریافت آیتم‌های انتخاب‌شده
-    #         selected_items = answers["remove_items"]
-    #         for item in selected_items:
-    #             items.remove(item)
-    #         table = Table(title="Final Items")
-    #         table.add_column("Item", style="cyan")
-    #         for item in items:
-    #             table.add_row(item)
-    # console.print(table)
+    else:
+        signup_page()
 
 
-login_and_signup_page()
+# program starts from here
+login_and_signup_selection()
+
+
+# def result_check(result, section):
+#     if result == 0:
+#         console.print(f"[bold red]{section} failed.[/bold red]")
+#     elif result == -1:
+#         console.print("[bold red] not found[/bold red]")
+#     else:
