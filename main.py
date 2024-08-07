@@ -5,10 +5,11 @@ from rich.table import Table
 from InquirerPy import prompt
 import config
 from InquirerPy.base.control import Choice
-from InquirerPy import inquirer
 
 
 console = Console()
+
+# Shows Users reserve history and Users can cancel and remove a reserve
 
 
 def my_reserve_page():
@@ -38,8 +39,10 @@ def my_reserve_page():
             console.print("[bold green]sucsessfull Canceled.[/bold green]")
 
         else:
-            console.print("[bold red]Action  failed failed.[/bold red]")
+            console.print("[bold red]Action failed.[/bold red]")
         firstpage()
+
+# user can choose to refactor password , usernsme or phonenumber
 
 
 def setting_page():
@@ -106,8 +109,12 @@ def setting_page():
 
     firstpage()
 
+# user choose dr expert then data bace extract dr list
+# user choose and set new reserve and reserve insert to data base
+
 
 def Create_New_Reserve_Page():
+    # user choose dr expert
     person = config.person_list[0]
     questions = [
         {
@@ -121,10 +128,11 @@ def Create_New_Reserve_Page():
     if category == "back":
         firstpage()
     else:
+        # data base extracts dr list with choosen expert
         drname_list = person.ShowDoctorName(category)
         drname_set = list(set(drname_list))
         drname_set.append("back")
-
+        # user choose a doctor from list
         questions = [
             {
                 "type": "list",
@@ -137,9 +145,11 @@ def Create_New_Reserve_Page():
         if drname == "back":
             Create_New_Reserve_Page()
         else:
+            # data base extracts Dates that choosen dr has capacity to visit user
             drdate_list = person.ShowDoctorDate(category, drname)
             drdate_set = list(set(drdate_list))
             drdate_set.append("back")
+            # user choose a date from list
             questions2 = [
                 {
                     "type": "list",
@@ -152,6 +162,7 @@ def Create_New_Reserve_Page():
             if drdate == "back":
                 Create_New_Reserve_Page()
             else:
+                # data base extracts time list that choosen doctor and date has capacity to visit user
                 drtime_list = person.ShowDoctorTime(category, drname, drdate)
                 drtime_set = list(set(drtime_list))
                 drtime_set.append("back")
@@ -167,6 +178,7 @@ def Create_New_Reserve_Page():
                 if drtime == "back":
                     Create_New_Reserve_Page()
                 else:
+                    # selected reserve info previews to user and wait for confirm or cancel
                     reserve_info = f"{category},{drname},{drdate},{
                         drtime}\n Confirm reserve info to submit:"
                     questions4 = [
@@ -178,14 +190,18 @@ def Create_New_Reserve_Page():
                         }]
                     answers = prompt(questions4)
                     result = answers["selection"]
+                    # reserve info added to data base
                     if result == "Confirm":
                         person.SubmitReserve(category, drname, drdate, drtime)
                         person.AddtoReserveInfo(drname, drdate, drtime)
                         console.print(
                             "[bold green]reserve sucsessfully submited.[/bold green]")
+                     # reserve cancele with no change at data base
                     else:
                         console.print("[bold red]reserve canceled.[/bold red]")
             firstpage()
+
+# after Logging in user see the first page and user can choose to do what
 
 
 def firstpage():
@@ -307,11 +323,3 @@ def login_and_signup_selection():
 
 # program starts from here
 login_and_signup_selection()
-
-
-# def result_check(result, section):
-#     if result == 0:
-#         console.print(f"[bold red]{section} failed.[/bold red]")
-#     elif result == -1:
-#         console.print("[bold red] not found[/bold red]")
-#     else:

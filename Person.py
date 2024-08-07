@@ -8,7 +8,7 @@ class Person:
         self.username = username
         self.password = password
         self.phone_number = phone_number
-        print(Id0, "fuckkkk")
+# Extracts user reserve history from data base and return that as a list
 
     def ReservedListShow(self):
         connection = Connection0()
@@ -18,6 +18,7 @@ class Person:
         cursor.execute(sql, val)
         reserve_list = cursor.fetchall()
         return reserve_list
+# searchs for reserve id and delete that row from date base
 
     def ReserveRemove(self, reserveID):
         connection = Connection0()
@@ -32,79 +33,37 @@ class Person:
         else:
             print("failed remove")
             return 0
+# changes and update the field (username ,password or phonenumber) at data base
+# polymorphism used
+
+    def ChangeField(self, field_name: str, new_value: str) -> int:
+        connection = Connection0()
+        cursor = connection.cursor()
+        sql = f"UPDATE userinfo SET {field_name}=%s WHERE ID=%s"
+        val = (new_value, config.Id0)
+        cursor.execute(sql, val)
+        connection.commit()
+
+        print(f"{field_name} changed")
+        if cursor.rowcount > 0:
+            print("successfully changes")
+            return 1
+        else:
+            print("failed change")
+            return 0
+# sends field(username) and new username to update at data base
 
     def ChangeUsername(self, newusername):
-        connection = Connection0()
-        cursor = connection.cursor()
-        sql = "UPDATE userinfo SET Username=%s WHERE ID=%s"
-        val = (newusername, config.Id0)
-        cursor.execute(sql, val)
-        connection.commit()
-        print("username changed")
-        if cursor.rowcount > 0:
-            print("successfully changes")
-            return 1
-        else:
-            print("failed change")
-            return 0
+        return self.ChangeField("Username", newusername)
+# sends field(phonenumber) and new phone number to update at data base
 
     def ChangePhoneNumber(self, newphonenumber):
-        connection = Connection0()
-        cursor = connection.cursor()
-        sql = "UPDATE userinfo SET PhoneNumber=%s WHERE ID=%s"
-        val = (newphonenumber, config.Id0)
-        cursor.execute(sql, val)
-        connection.commit()
-        print("phonenumber changed")
-        if cursor.rowcount > 0:
-            print("successfully changes")
-            return 1
-        else:
-            print("failed change")
-            return 0
+        return self.ChangeField("PhoneNumber", newphonenumber)
+# sends field(password) and new password to update at data base
 
     def ChangePassword(self, newpassword):
-        connection = Connection0()
-        cursor = connection.cursor()
-        sql = "UPDATE userinfo SET Password=%s WHERE ID=%s"
-        val = (newpassword, config.Id0)
-        cursor.execute(sql, val)
-        connection.commit()
-        print("password changed")
-        if cursor.rowcount > 0:
-            print("successfully changes")
-            return 1
-        else:
-            print("failed change")
-            return 0
-
-    # def Changeinfo(self, newusername, newphonenumber, newpassword):
-    #     connection = Connection0()
-    #     cursor = connection.cursor()
-    #     if newusername:
-    #         sql = "UPDATE userinfo SET Username=%s WHERE ID=%s"
-    #         val = (newusername, config.Id0)
-    #         cursor.execute(sql, val)
-    #         connection.commit()
-    #         print("username changed")
-    #     if newphonenumber:
-    #         sql = "UPDATE userinfo SET PhoneNumber=%s WHERE ID=%s"
-    #         val = (newphonenumber, config.Id0)
-    #         cursor.execute(sql, val)
-    #         connection.commit()
-    #         print("phonenumber changed")
-    #     if newpassword:
-    #         sql = "UPDATE userinfo SET Password=%s WHERE ID=%s"
-    #         val = (newpassword, config.Id0)
-    #         cursor.execute(sql, val)
-    #         connection.commit()
-    #         print("password changed")
-    #     if cursor.rowcount > 0:
-    #         print("successfully changes")
-    #         return 1
-    #     else:
-    #         print("failed change")
-    #         return 0
+        return self.ChangeField("Password", newpassword)
+# extracts dr list filtered by choosen expert and returns list
 
     def ShowDoctorName(self, category):
         current_date = date.today()
@@ -116,6 +75,7 @@ class Person:
         drlist = [row[1] for row in cursor.fetchall()]
         print(drlist)
         return drlist
+# extracts dr date list filtered by dr name and returns list
 
     def ShowDoctorDate(self, category, drname):
         current_date = date.today()
@@ -126,6 +86,7 @@ class Person:
         cursor.execute(sql, val)
         drdate = [row[3] for row in cursor.fetchall()]
         return drdate
+# extracts dr time list filtered by date and dr name and free capacity and return list
 
     def ShowDoctorTime(self, category, drname, drdate):
         current_date = date.today()
@@ -136,6 +97,7 @@ class Person:
         cursor.execute(sql, val)
         drtime = [row[4] for row in cursor.fetchall()]
         return drtime
+# Choosen reserve day and time capacity became full and not reserveable any more
 
     def SubmitReserve(self, category, drname, drdate, drtime):
         connection = Connection0()
@@ -152,6 +114,7 @@ class Person:
         else:
             print("failed submit")
             return 0
+# Insert new reserve to reserve_info data base
 
     def AddtoReserveInfo(self, drname, drdate, drtime):
         connection = Connection0()
