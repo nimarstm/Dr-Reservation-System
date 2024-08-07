@@ -106,7 +106,6 @@ class Person:
         val = (0, category, drname, drdate, drtime)
         cursor.execute(sql, val)
         connection.commit()
-        print("capacity changed")
         if cursor.rowcount > 0:
             print("successfully submited")
             return 1
