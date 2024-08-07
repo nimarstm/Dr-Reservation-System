@@ -121,7 +121,7 @@ def Create_New_Reserve_Page():
             "type": "list",
             "name": "selection",
             "message": "Choose Doctor Expert",
-            "choices": ["Dermotologist", "Cardiologist", "General Practitioner", "Gynecologist", "Neurologist", "back"],
+            "choices": ["Dermotologist", "Cardiologist", "General Practitioner", "back"],
         }]
     answers = prompt(questions)
     category = answers["selection"]
